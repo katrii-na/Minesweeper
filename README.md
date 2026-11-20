@@ -12,5 +12,5 @@ Make sure to compile with cmake! Commands are
 
 
 Credits!: 
-- All 876 wonderful contributers for SDL3!
+- All 876 wonderful contributers for SDL3! (https://github.com/libsdl-org/SDL)
 - Christopher Flynn, Minesweeper spritesheet used!
