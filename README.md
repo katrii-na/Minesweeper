@@ -5,8 +5,11 @@ Dependencies:
 - CMakeLists.txt (you could write this yourself but this is already set up)
 
 Make sure to compile with cmake! Commands are
-`cmake -S . -B build
-cmake -build Minesweeper`
+
+`cmake -S . -B build`
+
+`cmake -build Minesweeper`
+
 
 Credits!: 
 - All 876 wonderful contributers for SDL3!
