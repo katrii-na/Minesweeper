@@ -4,6 +4,10 @@ Dependencies:
 - SDL3 (In vendored.zip, #downloadDat!)
 - CMakeLists.txt (you could write this yourself but this is already set up)
 
+Make sure to compile with cmake! Commands are
+`cmake -S . -B build
+cmake -build Minesweeper`
+
 Credits!: 
 - All 876 wonderful contributers for SDL3!
 - Christopher Flynn, Minesweeper spritesheet used!
