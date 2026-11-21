@@ -2,15 +2,14 @@
 
 #include "Mine_Logic.h"
 
-
+// Pull over all global variables
 extern int Screenw;
 extern int boardx;
 extern int boardy;
-
 extern double scale;
 
 void pass(double m){
-  
+  /* Pass over variables */
   boardx = 18;
   boardy = 21;
   scale = 32;
@@ -18,7 +17,6 @@ void pass(double m){
   boardx = (int)(boardx * m);
   boardy =(int)(boardy*m);
   scale = scale/m;
-  
 }
 
 void floodFill(int x, int y, struct mine mineStates[128*128]){
@@ -26,20 +24,23 @@ void floodFill(int x, int y, struct mine mineStates[128*128]){
   if(x >= 0 && y >= 0 && x < boardy && y < boardx){
       bool pass = mineStates[x*boardx+y].state == 10 && mineStates[x*boardx+y].hidden == true && mineStates[x*boardx+y].flagged == false;
       
+      // Ignores flagged mines (makes things more fun!)      
+      // Chanes BEFORE checking if it can spread, this is so that it will always check the first mine you click
       if(!mineStates[x*boardx+y].flagged)
-      mineStates[x*boardx+y].hidden = false;
+        mineStates[x*boardx+y].hidden = false;
       
+      // Checks if it CAN spread, rlly simple floodfill actually
       if(pass){
-      // Spread
+        // Spread
        int dir[8][2] = {
-    {-1, -1}, {0, -1}, {1, -1}, 
-    {-1,  0},          {1,  0}, 
-    {-1,  1}, {0,  1}, {1,  1} 
-};
-      for(int i = 0; i<8; i++){
-      floodFill(x+dir[i][0], y+dir[i][1],mineStates);
+          {-1, -1},{0, -1},{1, -1}, 
+          {-1, 0},             {1,  0}, 
+          {-1, 1}, {0,  1},{1,  1} 
+       };
+        // Go in all 8 directions
+        for(int i = 0; i<8; i++){
+         floodFill(x+dir[i][0], y+dir[i][1],mineStates);
       }
-      
     }
   }
 }
@@ -51,25 +52,30 @@ void tick(struct mine mineStates[128*128]){
       
       int dir[8][2] = {
     {-1, -1}, {0, -1}, {1, -1}, 
-    {-1,  0},          {1,  0}, 
-    {-1,  1}, {0,  1}, {1,  1} 
-}; 
+    {-1,  0},               {1,  0}, 
+    {-1,  1}, {0,  1},  {1,  1} 
+};
+      // Go through every direction
       for(int i = 0; i<8; i++){
         if(x+dir[i][0] >= 0 && x+dir[i][0] < boardy&&y+dir[i][1] >= 0 && y+dir[i][1] < boardx){
+          // Add 1 to the amount of mines if there is a mine (and its on the board)
           if(mineStates[(x+dir[i][0])*boardx+y+dir[i][1]].state == 11) count++;
         }
       }
+      
+      // State 10 is empty
       if(count == 0) count = 10;
       
+      // Only updates empty tiles (Would overwrite mines otherwise)
       if(mineStates[x*boardx+y].state == 10)
-      mineStates[x*boardx+y].state = count;
+        mineStates[x*boardx+y].state = count;
     }
   }
 }
 
 
 void render9ScaleRotate(SDL_Renderer *render,SDL_Texture *Spritesheet,SDL_FRect *position, int deg,SDL_FRect gridTile ){
-  /* ROTATE AND RENDER A 9 scale TEXTURE. */
+  /* ROTATE AND RENDER A 9 SCALED TEXTURE. */
   double s = Screenw*(2.4/704.0);
   double r = Screenw*(5/704.0);
   
@@ -93,30 +99,31 @@ void render9ScaleRotate(SDL_Renderer *render,SDL_Texture *Spritesheet,SDL_FRect 
 }
 
 void renderBorders(SDL_Renderer *render,SDL_Texture *Spritesheet,SDL_FRect gridTile ){
+  /* VANITY, KEEPS MAIN CLEAN */
   double s = Screenw*(2.4/704.0);
   double r = Screenw*(5/704.0);
-  /* VANITY, KEEPS MAIN CLEAN */
+  double scaled = scale;
   SDL_FRect pos;
+  
   //bg
   pos = (SDL_FRect){.x=0,.y=0,.w=Screenw,.h=Screenw};
   SDL_RenderTexture9Grid(render, Spritesheet,&gridTile,r,r,r,r,s,&pos);
-  double scaled = scale;
+  
   //inlet
   pos = (SDL_FRect){.x=Screenw*(11/704.0),.y=Screenw*(106/704.0),.w=Screenw*((scaled*boardy+10)/704.0),.h=Screenw*((scaled*boardx+12)/704.0)};
   render9ScaleRotate(render, Spritesheet, &pos,180,gridTile);
   
   pos = (SDL_FRect){.x=Screenw*(11/704.0),.y=Screenw*(11/704.0),.w=Screenw*((32*21+10)/704.0),.h=Screenw*(86/704.0)};
   render9ScaleRotate(render, Spritesheet, &pos,180,gridTile);
-  //outlet
   
+  //outlets
   pos = (SDL_FRect){.x=Screenw*(27/704.0),.y=Screenw*(19/704.0),.w=Screenw*((32*3+9)/704.0),.h=Screenw*((69)/704.0)};
   render9ScaleRotate(render, Spritesheet, &pos,0,gridTile);
   
   pos = (SDL_FRect){.x=Screenw*(570/704.0),.y=Screenw*(19/704.0),.w=Screenw*((32*3+9)/704.0),.h=Screenw*((69)/704.0)};
   render9ScaleRotate(render, Spritesheet, &pos,0,gridTile);
   
-  
-  
+
   
 }
 void renderGrid(SDL_Renderer *render,SDL_Texture* Spritesheet, int mines[128][128],struct mine minestates[boardy*boardx]){
@@ -126,6 +133,7 @@ void renderGrid(SDL_Renderer *render,SDL_Texture* Spritesheet, int mines[128][12
   SDL_FRect num[15];
   SDL_FRect highlightOverlay = {.x=0,.y=85,.w=15.7,.h=15.7};
   
+  // Set all states
   num[0] = (SDL_FRect){.x=0,.y=51.1,.w=16,.h=16}; //Default
   for(int i=1;i<10;i++){
     num[i] = (SDL_FRect){.x=17*(i-1),.y=68,.w=16,.h=16};

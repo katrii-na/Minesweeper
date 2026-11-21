@@ -1,9 +1,10 @@
 #include "Mine_Logic.h"
+
+// Wayyy too many variables holy-
 int Screenw = 704;
 int Screenh = 704;
 
-double m = 1;
-
+double m = 4;
 int boardx = 18;
 int boardy = 21;
 
@@ -21,7 +22,7 @@ int main(){
   SDL_Window* window = SDL_CreateWindow("Minesweeper", 704,704,SDL_WINDOW_RESIZABLE);
   SDL_Renderer* render = SDL_CreateRenderer(window,0);
   
-  SDL_SetWindowMaximumSize(window,1028,1028);
+  SDL_SetWindowMaximumSize(window,2056,2056);
   
   int x = 0, y = 0;
   
@@ -35,7 +36,7 @@ int main(){
   int time = 0;
   
   // MINES COUNT
-  int totalMines = 99;
+  int totalMines = 1;
   int nonMinesCount = 0;
   int numFlags = 0;
   
@@ -69,6 +70,7 @@ int main(){
   char medPath[128];
   char hardPath[128];
   
+  // Load all files
   snprintf(imagePath, sizeof(imagePath),"%s/MineSheet.png",       SDL_GetBasePath());
   snprintf(titlePath, sizeof(titlePath),"%s/Title.png", SDL_GetBasePath());
   snprintf(easyPath, sizeof(easyPath),"%s/Easy.png", SDL_GetBasePath());
@@ -88,6 +90,7 @@ int main(){
   
   temp = IMG_Load(hardPath);
   SDL_Texture* Hard = SDL_CreateTextureFromSurface(render, temp);
+  
   // SLICING SPRITESHEET //
   
   SDL_FRect gridTile = {.x=0,.y=51.1,.w=15.7,.h=15.7};
@@ -96,8 +99,11 @@ int main(){
   SDL_FRect faceWin = {.x=27*3,.y=24,.w=26,.h=26};
   SDL_FRect faceLose = {.x=27*4,.y=24,.w=26,.h=26};
   bool title = true;
+  pass(m);
   
   
+  
+   // PROGRAM START
   while(running){
   
     
@@ -155,30 +161,35 @@ int main(){
     pos =(SDL_FRect){.x=Screenw*((704/2.0-420/2)/704.0),.y=Screenw*(32/704.0),.w=Screenw*(420/704.0),.h=Screenw*(48/704.0)};
     SDL_RenderTexture(render,Title,NULL, &pos);
     
-    pos =(SDL_FRect){.x=Screenw*((704/2.0-420/2)/704.0),.y=Screenw*(225/704.0),.w=Screenw*(420/704.0),.h=Screenw*(92/704.0)};
+    pos =(SDL_FRect){.x=Screenw*((704/2.0-420/2)/704.0),.y=Screenw*((115)/704.0),.w=Screenw*(420/704.0),.h=Screenw*(92/704.0)};
     bool easy = (mousex>pos.x && mousey>pos.y && mousex < pos.x+pos.w  && mousey < pos.y+pos.h );
     render9ScaleRotate(render,Spritesheet,&pos,0,gridTile);
-    
 
     
-    pos =(SDL_FRect){.x=Screenw*((704/2.0-420/2)/704.0),.y=Screenw*((375+92/4)/704.0),.w=Screenw*(420/704.0),.h=Screenw*(92/704.0)};
+    pos =(SDL_FRect){.x=Screenw*((704/2.0-420/2)/704.0),.y=Screenw*((375+92/4-150)/704.0),.w=Screenw*(420/704.0),.h=Screenw*(92/704.0)};
     bool medium = (mousex>pos.x && mousey>pos.y && mousex < pos.x+pos.w  && mousey < pos.y+pos.h );
     render9ScaleRotate(render,Spritesheet,&pos,0,gridTile);
    
     
-    pos =(SDL_FRect){.x=Screenw*((704/2.0-420/2)/704.0),.y=Screenw*((375+200)/704.0),.w=Screenw*(420/704.0),.h=Screenw*(92/704.0)};
+    pos =(SDL_FRect){.x=Screenw*((704/2.0-420/2)/704.0),.y=Screenw*((375)/704.0),.w=Screenw*(420/704.0),.h=Screenw*(92/704.0)};
     bool hard = (mousex>pos.x && mousey>pos.y && mousex < pos.x+pos.w  && mousey < pos.y+pos.h );
     render9ScaleRotate(render,Spritesheet,&pos,0,gridTile);
     
-        pos =(SDL_FRect){.x=Screenw*((704/2.0-420/2+115)/704.0),.y=Screenw*((225+(92/4))/704.0),.w=Screenw*(210/704.0),.h=Screenw*(48/704.0)};
+    pos =(SDL_FRect){.x=Screenw*((704/2.0-420/2)/704.0),.y=Screenw*((375+200)/704.0),.w=Screenw*(420/704.0),.h=Screenw*(92/704.0)};
+    bool uhoh = (mousex>pos.x && mousey>pos.y && mousex < pos.x+pos.w  && mousey < pos.y+pos.h );
+    render9ScaleRotate(render,Spritesheet,&pos,0,gridTile);
+    
+        pos =(SDL_FRect){.x=Screenw*((704/2.0-420/2+115)/704.0),.y=Screenw*((135)/704.0),.w=Screenw*(210/704.0),.h=Screenw*(48/704.0)};
     SDL_RenderTexture(render,Easy,NULL, &pos);
     
-     pos =(SDL_FRect){.x=Screenw*((704/2.0-520/2+115)/704.0),.y=Screenw*(((375+92/4)+(92/4))/704.0),.w=Screenw*((210+80)/704.0),.h=Screenw*(48/704.0)};
+     pos =(SDL_FRect){.x=Screenw*((704/2.0-520/2+115)/704.0),.y=Screenw*(((375+92/4)+(92/4)-155)/704.0),.w=Screenw*((210+80)/704.0),.h=Screenw*(48/704.0)};
     SDL_RenderTexture(render,Medium,NULL, &pos);
     
-    pos =(SDL_FRect){.x=Screenw*((704/2.0-420/2+115)/704.0),.y=Screenw*(((375+200)+(92/4))/704.0),.w=Screenw*(210/704.0),.h=Screenw*(48/704.0)};
+    pos =(SDL_FRect){.x=Screenw*((704/2.0-420/2+115)/704.0),.y=Screenw*(((375)+(92/4))/704.0),.w=Screenw*(210/704.0),.h=Screenw*(48/704.0)};
     SDL_RenderTexture(render,Hard,NULL, &pos);
     
+    pos =(SDL_FRect){.x=Screenw*((704/2.0-420/2+115)/704.0),.y=Screenw*(((375+200+200)+(92/4))/704.0),.w=Screenw*(210/704.0),.h=Screenw*(48/704.0)};
+    SDL_RenderTexture(render,Hard,NULL, &pos);
     
     SDL_RenderPresent(render);
     
@@ -211,6 +222,17 @@ int main(){
       totalMines = 150;
       flags = totalMines;
       pass(1.369);
+      
+      for(int i=0; i<3;i++){
+        events[i] = false;
+      }
+      }
+      else if(uhoh && events[0]){
+      title = false;
+      
+      totalMines = 500;
+      flags = 0;
+      pass(2.9);
       
       for(int i=0; i<3;i++){
         events[i] = false;
